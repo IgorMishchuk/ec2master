@@ -13,4 +13,7 @@ ec2master uses the configuration file created by AWS cli e.g.
 
 ## Running
 
-`pipenv run python .\ec2master\ec2master.py`
+`pipenv run python .\ec2master\ec2master.py <command> <--project=PROJECT>`
+
+*command* is list, start, stop
+*project* is optional
