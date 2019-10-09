@@ -24,7 +24,7 @@ def snapshots():
 
 @snapshots.command('list')
 @click.option('--project', default=None, help="Only snapshots for project (tag Project:<nam>)")
-def list_instacnes(project):
+def list_snapshots(project):
     "List EC2 snapshots"
 
     instances = filter_instances(project)
@@ -49,7 +49,7 @@ def volumes():
 
 @volumes.command('list')
 @click.option('--project', default=None, help="Only volumes for project (tag Project:<nam>)")
-def list_instacnes(project):
+def list_volumes(project):
     "List EC2 volumes"
 
     instances = filter_instances(project)
@@ -78,10 +78,17 @@ def create_snapshots(project):
     instances = filter_instances(project)
 
     for i in instances:
+        print("Stopping {0}...".format(i.id))
+        i.stop()
+        i.wait_until_stopped()
         for v in i.volumes.all():
-            print("Creating snashot of {0}".format(v.id))
+            print(" Creating snashot of {0}".format(v.id))
             v.create_snapshot(Description="Created by EC2Master")
+        print("Starting {0}...".format(i.id))
+        i.start()
+        i.wait_until_running()
     
+    print("Job's done.")
     return
 
 @instances.command('list')
