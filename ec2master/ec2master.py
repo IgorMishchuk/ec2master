@@ -80,9 +80,11 @@ def instances():
 
 @instances.command('snapshot', help="Create snapshots of all volumes")
 @click.option('--project', default=None, help="Only instances for project (tag Project:<nam>)")
-def create_snapshots(project):
+@click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
+def create_snapshots(project, force):
     "Create snapshots for EC2 instances"
-
+    if not force and not project:
+        raise Exception('You need to pass --force if you want to run command against all instances')
     instances = filter_instances(project)
 
     for i in instances:
@@ -124,9 +126,11 @@ def list_instacnes(project):
 
 @instances.command('stop')
 @click.option('--project', default=None, help='Only instacnes for project')
-def stop_instances(project):
+@click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
+def stop_instances(project, force):
     "Stop EC2 instances"
-
+    if not force and not project:
+        raise Exception('You need to pass --force if you want to run command against all instances')
     instances = filter_instances(project)
 
     for i in instances:
@@ -141,7 +145,8 @@ def stop_instances(project):
 
 @instances.command('start')
 @click.option('--project', default=None, help='Only instacnes for project')
-def start_instances(project):
+@click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
+def start_instances(project, force):
     "Start EC2 instances"
 
     instances = filter_instances(project)
@@ -158,7 +163,8 @@ def start_instances(project):
 
 @instances.command('reboot')
 @click.option('--project', default=None, help='Only instacnes for project')
-def reboot_instances(project):
+@click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
+def reboot_instances(project, force):
     "Reboot EC2 instances"
 
     instances = filter_instances(project)
