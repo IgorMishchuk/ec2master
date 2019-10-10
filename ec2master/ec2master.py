@@ -2,9 +2,6 @@ import boto3
 import botocore
 import click
 
-session = boto3.Session(profile_name='ec2master')
-ec2 = session.resource('ec2')
-
 def filter_instances(project):
     instances=[]
     if project:
@@ -20,8 +17,12 @@ def has_pending_snapshot(volume):
     return snapshots and snapshots[0].state == 'pending'
 
 @click.group()
-def cli():
+@click.option('--profile', default='testuser', help="Specify profile to use")
+def cli(profile):
     """EC2Master manages snapshots"""
+    session = boto3.Session(profile_name=profile)
+    global ec2
+    ec2 = session.resource('ec2')
 
 @cli.group('snapshots')
 def snapshots():
@@ -148,7 +149,8 @@ def stop_instances(project, force):
 @click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
 def start_instances(project, force):
     "Start EC2 instances"
-
+    if not force and not project:
+        raise Exception('You need to pass --force if you want to run command against all instances')
     instances = filter_instances(project)
 
     for i in instances:
@@ -166,7 +168,8 @@ def start_instances(project, force):
 @click.option('--force', 'force', default=False, is_flag=True, help="Force command run for all instances")
 def reboot_instances(project, force):
     "Reboot EC2 instances"
-
+    if not force and not project:
+        raise Exception('You need to pass --force if you want to run command against all instances')
     instances = filter_instances(project)
 
     for i in instances:
