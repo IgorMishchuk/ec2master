@@ -6,7 +6,7 @@ session = boto3.Session(profile_name='ec2master')
 ec2 = session.resource('ec2')
 
 def filter_instances(project):
-    instance=[]
+    instances=[]
     if project:
         filters =[{'Name':'tag:Project', 'Values':[project]}]
         instances = ec2.instances.filter(Filters=filters)
@@ -133,7 +133,7 @@ def stop_instances(project):
         print("Stopping {0}...".format(i.id))
         try:
             i.stop()
-        except botocore.exception.ClientError as e:
+        except botocore.exceptions.ClientError as e:
             print(" Could not stop {0}. ".format(i.id) + str(e))
             continue
 
@@ -150,8 +150,25 @@ def start_instances(project):
         print("Starting {0}...".format(i.id))
         try:
             i.start()
-        except botocore.exception.ClientError as e:
+        except botocore.exceptions.ClientError as e:
             print(" Could not start {0}. ".format(i.id) + str(e))
+            continue
+
+    return
+
+@instances.command('reboot')
+@click.option('--project', default=None, help='Only instacnes for project')
+def reboot_instances(project):
+    "Reboot EC2 instances"
+
+    instances = filter_instances(project)
+
+    for i in instances:
+        print("Rebooting {0}...".format(i.id))
+        try:
+            i.reboot()
+        except botocore.exceptions.ClientError as e:
+            print(" Could not reboot {0}. ".format(i.id) + str(e))
             continue
 
     return
